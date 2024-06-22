@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML to PDF</title>
+
+
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+
+
+    <div class="project" id="content">
+        <!-- Banner section -->
+        <section class="banner__section">
+            <div class="container">
+                <div class="course__info">
+                    <p class="course__name"><span>“Algoritmlar”</span> kursini tamomlagani haqida</p>
+                    <img src="../images/42.uz.svg" alt="42.UZ logo">
+                </div>
+
+                <div class="user__info">
+                    <h1 class="sertifikat">
+                        SERTIFIKAT
+                    </h1>
+
+                    <p class="user__name">
+                        Jasur Hakimov
+                    </p>
+                    <p class="user__description">
+                        Ushbu sertifikat Jasur Hakimovga <span>2024-yil, 25-iyun</span> kuni 42.uz platformasida
+                        <span>“Algoritmlar”</span> kursini muvaffaqiyatli tamomlagani uchun berildi.
+                    </p>
+
+                    <img id="downloadBtn" class="QR__image" src="../images/QR.svg" alt="QR image">
+                </div>
+            </div>
+        </section>
+        <!-- Banner section end -->
+
+        <!-- footer section -->
+        <section class="footer__section">
+            <div class="footer__container">
+                <div class="footer__item">
+                    <div class="imzo">
+                        <img src="../images/signature.svg" alt="Imzo">
+                        <div class="line"></div>
+                    </div>
+                    <p class="dev">Yusuf Abdullaev,</p>
+                    <p>Co-founder, CEO</p>
+                </div>
+                <div class="footer__item">
+                    <img src="../images/people.svg" alt="People img">
+                    <p class="date">2024-yil, 25-iyun</p>
+                </div>
+            </div>
+        </section>
+        <!-- footer section end -->
+    </div>
+
+    <!-- jsPDF va html2canvas kutubxonalarini qo'shish -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script>
+        document.getElementById('downloadBtn').addEventListener('click', async function () {
+            const { jsPDF } = window.jspdf;
+            const content = document.getElementById('content');
+
+            // HTML mazmunini canvas formatiga aylantirish
+            const canvas = await html2canvas(content, {
+                scale: 2,  // yuqori aniqlikda rasm yaratish uchun
+                useCORS: true // cross-origin ruxsat berish
+            });
+            const imgData = canvas.toDataURL('image/png');
+
+            // PDF yaratish
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const imgWidth = 210;
+            const pageHeight = 295;
+            const imgHeight = canvas.height * imgWidth / canvas.width;
+            let heightLeft = imgHeight;
+            let position = 0;
+
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+
+            while (heightLeft >= 0) {
+                position = heightLeft - imgHeight;
+                pdf.addPage();
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+            }
+
+            // PDF ni yuklab olish
+            pdf.save('sample.pdf');
+        });
+    </script>
+</body>
+
+</html>
